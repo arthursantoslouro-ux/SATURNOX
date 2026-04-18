@@ -174,8 +174,10 @@ button{
 <div id="home" class="box">
   <h3>Sensis</h3>
 
-  <!-- 🔍 SEARCH -->
-  <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
+  <div style="display:flex;gap:8px;">
+    <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
+    <input id="filtroData" type="date" onchange="filtrar()" style="max-width:150px;">
+  </div>
 
   <div id="lista"></div>
 </div>
@@ -209,8 +211,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let listaDados = []; // cache
+let listaDados = [];
 
+/* MENU */
 window.toggleMenu = () => {
   sidebar.classList.toggle("open");
   overlay.classList.toggle("show");
@@ -226,6 +229,7 @@ window.setActive = (el)=>{
   el.classList.add("active");
 };
 
+/* CAMPOS */
 window.addField = () => {
   const div = document.createElement("div");
   div.className = "field";
@@ -239,9 +243,36 @@ window.addField = () => {
   fields.appendChild(div);
 };
 
+/* DATA */
+function formatarData(dataStr){
+  let data = dataStr ? new Date(dataStr) : new Date();
+
+  if(isNaN(data.getTime())){
+    data = new Date();
+  }
+
+  let hoje = new Date();
+  let ontem = new Date();
+  ontem.setDate(hoje.getDate()-1);
+
+  let mesma = (a,b)=>
+    a.getFullYear()===b.getFullYear() &&
+    a.getMonth()===b.getMonth() &&
+    a.getDate()===b.getDate();
+
+  if(mesma(data,hoje)) return "Hoje";
+  if(mesma(data,ontem)) return "Ontem";
+
+  return data.toLocaleDateString();
+}
+
+/* SALVAR */
 window.salvar = async () => {
 
-  let obj = { nome: nome.value || "sem nome" };
+  let obj = { 
+    nome: nome.value || "sem nome",
+    data: new Date().toISOString()
+  };
 
   document.querySelectorAll(".field").forEach(f=>{
     let k = f.children[0].value;
@@ -260,7 +291,7 @@ window.copiarSensi = async (d) => {
   let texto = `${d.nome}\n\n`;
 
   Object.keys(d).forEach(k=>{
-    if(k !== "nome"){
+    if(k !== "nome" && k !== "data"){
       texto += `${k}: ${d[k]}\n`;
     }
   });
@@ -271,25 +302,33 @@ window.copiarSensi = async (d) => {
 
 /* RENDER */
 function render(listaFiltrada){
+
+  // ordena por mais recente
+  listaFiltrada.sort((a,b)=>{
+    let da = new Date(a.data || 0).getTime();
+    let db = new Date(b.data || 0).getTime();
+    return db - da;
+  });
+
   lista.innerHTML="";
 
   listaFiltrada.forEach(d=>{
     let html = `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;justify-content:space-between;">
         <b>${d.nome}</b>
-        <button onclick='copiarSensi(${JSON.stringify(d)})' style="width:auto;padding:6px 10px;font-size:12px;">
-          Copiar
-        </button>
-      </div><br>`;
+        <small>${formatarData(d.data)}</small>
+      </div>
+      <button onclick='copiarSensi(${JSON.stringify(d)})' style="width:auto;padding:6px 10px;font-size:12px;margin-top:5px;">
+        Copiar
+      </button><br>`;
 
     Object.keys(d).forEach(k=>{
-      if(k !== "nome"){
+      if(k !== "nome" && k !== "data"){
         html += `${k}: ${d[k]}<br>`;
       }
     });
 
     html += `</div>`;
-
     lista.innerHTML += html;
   });
 }
@@ -297,10 +336,26 @@ function render(listaFiltrada){
 /* FILTRO */
 window.filtrar = () => {
   let q = search.value.toLowerCase();
+  let dataFiltro = filtroData.value;
 
-  let filtrado = listaDados.filter(d =>
-    (d.nome || "").toLowerCase().includes(q)
-  );
+  let filtrado = listaDados.filter(d => {
+
+    let nomeOk = (d.nome || "").toLowerCase().includes(q);
+
+    if(!dataFiltro) return nomeOk;
+
+    if(!d.data) return false;
+
+    let dataObj = new Date(d.data);
+
+    let ano = dataObj.getFullYear();
+    let mes = String(dataObj.getMonth()+1).padStart(2,'0');
+    let dia = String(dataObj.getDate()).padStart(2,'0');
+
+    let dataItem = `${ano}-${mes}-${dia}`;
+
+    return nomeOk && dataItem === dataFiltro;
+  });
 
   render(filtrado);
 };
@@ -318,4 +373,4 @@ onSnapshot(collection(db,"sensis"), snap=>{
 </script>
 
 </body>
-  </html>
+</html>

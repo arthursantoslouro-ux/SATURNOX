@@ -33,7 +33,6 @@ body{
 }
 
 .title{
-  margin-left:10px;
   font-family:'Rajdhani';
   font-weight:700;
   letter-spacing:2px;
@@ -47,6 +46,8 @@ body{
   height:36px;
   background:none;
   border:none;
+  color:white;
+  font-size:18px;
 }
 
 .sidebar{
@@ -164,15 +165,22 @@ button{
   <div class="item" onclick="show('create');setActive(this);toggleMenu()">➕ Criar</div>
 </div>
 
+<!-- 🔥 TOPBAR COM LOGO -->
 <div class="topbar">
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
-  <div class="title">SENSIDRØID</div>
+
+  <div style="display:flex;align-items:center;gap:8px;">
+    <img src="https://raw.githubusercontent.com/arthursantoslouro-ux/SATURNOX/refs/heads/main/logoapp.png"
+         style="width:30px;height:30px;border-radius:8px;box-shadow:0 0 10px rgba(220,38,38,0.6);">
+
+    <div class="title">SENSIDRØID</div>
+  </div>
 </div>
 
 <div class="main">
 
 <div id="home" class="box">
-  <h3>Sensis</h3>
+  <h3>Sensibilidades e config</h3>
 
   <div style="display:flex;gap:8px;">
     <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
@@ -246,10 +254,7 @@ window.addField = () => {
 /* DATA */
 function formatarData(dataStr){
   let data = dataStr ? new Date(dataStr) : new Date();
-
-  if(isNaN(data.getTime())){
-    data = new Date();
-  }
+  if(isNaN(data.getTime())) data = new Date();
 
   let hoje = new Date();
   let ontem = new Date();
@@ -303,7 +308,6 @@ window.copiarSensi = async (d) => {
 /* RENDER */
 function render(listaFiltrada){
 
-  // ordena por mais recente
   listaFiltrada.sort((a,b)=>{
     let da = new Date(a.data || 0).getTime();
     let db = new Date(b.data || 0).getTime();

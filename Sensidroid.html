@@ -21,6 +21,7 @@ body{
   font-family:'DM Sans',system-ui;
   background:linear-gradient(180deg, #140707 0%, #0a0a0a 60%);
   color:var(--text);
+  overflow-x: hidden;
 }
 
 .topbar{
@@ -30,6 +31,9 @@ body{
   padding:0 16px;
   background:rgba(10,5,5,0.85);
   backdrop-filter:blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .title{
@@ -59,6 +63,7 @@ body{
   background:var(--panel);
   transition:.25s;
   padding-top:60px;
+  z-index: 1000;
 }
 
 .sidebar.open{ left:0; }
@@ -70,6 +75,7 @@ body{
   opacity:0;
   pointer-events:none;
   transition:.2s;
+  z-index: 999;
 }
 .overlay.show{
   opacity:1;
@@ -153,6 +159,11 @@ button{
   border-radius:12px;
   background:#0f0606;
 }
+
+#resultadoBotao {
+  margin-top: 15px;
+  text-align: center;
+}
 </style>
 </head>
 
@@ -163,43 +174,43 @@ button{
 <div class="sidebar" id="sidebar">
   <div class="item active" onclick="show('home');setActive(this);toggleMenu()">🏠 Home</div>
   <div class="item" onclick="show('create');setActive(this);toggleMenu()">➕ Criar</div>
+  <div class="item" onclick="show('perfect-btn');setActive(this);toggleMenu()">🎯 Botão Perfeito</div>
 </div>
 
-<!-- 🔥 TOPBAR COM LOGO -->
 <div class="topbar">
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
-
   <div style="display:flex;align-items:center;gap:8px;">
     <img src="https://raw.githubusercontent.com/arthursantoslouro-ux/SATURNOX/refs/heads/main/logoapp.png"
          style="width:30px;height:30px;border-radius:8px;box-shadow:0 0 10px rgba(220,38,38,0.6);">
-
     <div class="title">SENSIDRØID</div>
   </div>
 </div>
 
 <div class="main">
 
-<div id="home" class="box">
-  <h3>Sensibilidades e config</h3>
-
-  <div style="display:flex;gap:8px;">
-    <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
-    <input id="filtroData" type="date" onchange="filtrar()" style="max-width:150px;">
+  <div id="home" class="box">
+    <h3>Sensibilidades e config</h3>
+    <div style="display:flex;gap:8px;">
+      <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
+      <input id="filtroData" type="date" onchange="filtrar()" style="max-width:150px;">
+    </div>
+    <div id="lista"></div>
   </div>
 
-  <div id="lista"></div>
-</div>
+  <div id="create" class="box" style="display:none">
+    <h3>Criar Sensi</h3>
+    <input id="nome" placeholder="Nome da sensi">
+    <div id="fields"></div>
+    <button class="btn2" onclick="addField()">+ Adicionar campo</button>
+    <button onclick="salvar()">Salvar Sensi</button>
+  </div>
 
-<div id="create" class="box" style="display:none">
-<h3>Criar Sensi</h3>
-
-<input id="nome" placeholder="Nome da sensi">
-<div id="fields"></div>
-
-<button class="btn2" onclick="addField()">+ Adicionar campo</button>
-<button onclick="salvar()">Salvar Sensi</button>
-
-</div>
+  <div id="perfect-btn" class="box" style="display:none">
+    <h3>Gerador de Botão</h3>
+    <p style="color:var(--muted); font-size:14px;">Calcula o tamanho do botão baseado na resolução real detectada pelo sistema.</p>
+    <button onclick="gerarBotaoPerfeito()">GERAR BOTÃO PERFEITO</button>
+    <div id="resultadoBotao"></div>
+  </div>
 
 </div>
 
@@ -221,15 +232,18 @@ const db = getFirestore(app);
 
 let listaDados = [];
 
-/* MENU */
+// MENU
 window.toggleMenu = () => {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
   sidebar.classList.toggle("open");
   overlay.classList.toggle("show");
 };
 
 window.show = (p) => {
-  home.style.display = p==="home"?"block":"none";
-  create.style.display = p==="create"?"block":"none";
+  document.getElementById("home").style.display = p==="home"?"block":"none";
+  document.getElementById("create").style.display = p==="create"?"block":"none";
+  document.getElementById("perfect-btn").style.display = p==="perfect-btn"?"block":"none";
 };
 
 window.setActive = (el)=>{
@@ -237,85 +251,96 @@ window.setActive = (el)=>{
   el.classList.add("active");
 };
 
-/* CAMPOS */
+// LÓGICA DO BOTÃO PERFEITO USANDO DADOS DO SKETCHWARE
+window.gerarBotaoPerfeito = () => {
+  // Pega as variáveis window.screenWidth e window.screenHeight enviadas pelo Java
+  let w = window.screenWidth || window.innerWidth;
+  let h = window.screenHeight || window.innerHeight;
+  
+  // Algoritmo de cálculo para o botão (Baseado em DPI/Resolução)
+  let calculo = (w * 0.045) + (h * 0.012); 
+  let tamanhoFinal = Math.round(calculo);
+  
+  // Ajustes de limite para estabilidade no jogo
+  if(tamanhoFinal > 60) tamanhoFinal = 58;
+  if(tamanhoFinal < 39) tamanhoFinal = 44;
+
+  document.getElementById("resultadoBotao").innerHTML = `
+    <div class="card" style="border-left-color:#22c55e; background: rgba(34, 197, 94, 0.05);">
+      <small style="color:var(--muted)">Resolução: ${w}x${h}</small><br>
+      <span style="color:white; font-size:14px; font-weight:bold;">TAMANHO DO BOTÃO</span>
+      <div style="font-size:42px; color:#22c55e; font-family:'Rajdhani'; font-weight:700;">${tamanhoFinal}%</div>
+      <p style="font-size:11px; color:var(--muted); margin-top:5px;">Ideal para a sua sensibilidade atual.</p>
+    </div>
+  `;
+};
+
+// CAMPOS
 window.addField = () => {
   const div = document.createElement("div");
   div.className = "field";
-
   div.innerHTML = `
     <input placeholder="Nome">
     <input placeholder="Valor">
     <button class="small" onclick="this.parentElement.remove()">✕</button>
   `;
-
-  fields.appendChild(div);
+  document.getElementById("fields").appendChild(div);
 };
 
-/* DATA */
+// DATA
 function formatarData(dataStr){
   let data = dataStr ? new Date(dataStr) : new Date();
   if(isNaN(data.getTime())) data = new Date();
-
   let hoje = new Date();
   let ontem = new Date();
   ontem.setDate(hoje.getDate()-1);
-
   let mesma = (a,b)=>
     a.getFullYear()===b.getFullYear() &&
     a.getMonth()===b.getMonth() &&
     a.getDate()===b.getDate();
-
   if(mesma(data,hoje)) return "Hoje";
   if(mesma(data,ontem)) return "Ontem";
-
   return data.toLocaleDateString();
 }
 
-/* SALVAR */
+// SALVAR
 window.salvar = async () => {
-
+  const nome = document.getElementById("nome").value;
   let obj = { 
-    nome: nome.value || "sem nome",
+    nome: nome || "sem nome",
     data: new Date().toISOString()
   };
-
   document.querySelectorAll(".field").forEach(f=>{
     let k = f.children[0].value;
     let v = f.children[1].value;
     if(k) obj[k] = v || "0";
   });
-
   await addDoc(collection(db,"sensis"), obj);
-
-  fields.innerHTML="";
-  nome.value="";
+  document.getElementById("fields").innerHTML="";
+  document.getElementById("nome").value="";
 };
 
-/* COPIAR */
+// COPIAR
 window.copiarSensi = async (d) => {
   let texto = `${d.nome}\n\n`;
-
   Object.keys(d).forEach(k=>{
     if(k !== "nome" && k !== "data"){
       texto += `${k}: ${d[k]}\n`;
     }
   });
-
   await navigator.clipboard.writeText(texto);
   alert("Copiado!");
 };
 
-/* RENDER */
+// RENDER
 function render(listaFiltrada){
-
+  const lista = document.getElementById("lista");
   listaFiltrada.sort((a,b)=>{
     let da = new Date(a.data || 0).getTime();
     let db = new Date(b.data || 0).getTime();
     return db - da;
   });
-
   lista.innerHTML="";
-
   listaFiltrada.forEach(d=>{
     let html = `<div class="card">
       <div style="display:flex;justify-content:space-between;">
@@ -325,53 +350,36 @@ function render(listaFiltrada){
       <button onclick='copiarSensi(${JSON.stringify(d)})' style="width:auto;padding:6px 10px;font-size:12px;margin-top:5px;">
         Copiar
       </button><br>`;
-
     Object.keys(d).forEach(k=>{
       if(k !== "nome" && k !== "data"){
         html += `${k}: ${d[k]}<br>`;
       }
     });
-
     html += `</div>`;
     lista.innerHTML += html;
   });
 }
 
-/* FILTRO */
+// FILTRO
 window.filtrar = () => {
-  let q = search.value.toLowerCase();
-  let dataFiltro = filtroData.value;
-
+  let q = document.getElementById("search").value.toLowerCase();
+  let dataFiltro = document.getElementById("filtroData").value;
   let filtrado = listaDados.filter(d => {
-
     let nomeOk = (d.nome || "").toLowerCase().includes(q);
-
     if(!dataFiltro) return nomeOk;
-
     if(!d.data) return false;
-
     let dataObj = new Date(d.data);
-
-    let ano = dataObj.getFullYear();
-    let mes = String(dataObj.getMonth()+1).padStart(2,'0');
-    let dia = String(dataObj.getDate()).padStart(2,'0');
-
-    let dataItem = `${ano}-${mes}-${dia}`;
-
+    let dataItem = `${dataObj.getFullYear()}-${String(dataObj.getMonth()+1).padStart(2,'0')}-${String(dataObj.getDate()).padStart(2,'0')}`;
     return nomeOk && dataItem === dataFiltro;
   });
-
   render(filtrado);
 };
 
-/* SNAPSHOT */
 onSnapshot(collection(db,"sensis"), snap=>{
   listaDados = [];
-
   snap.forEach(doc=>{
     listaDados.push(doc.data());
   });
-
   render(listaDados);
 });
 </script>

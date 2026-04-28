@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -14,6 +14,7 @@
   --text:#f5f5f5;
   --muted:#9ca3af;
   --accent:#dc2626;
+  --gold:#ffcc00;
 }
 
 body{
@@ -21,7 +22,7 @@ body{
   font-family:'DM Sans',system-ui;
   background:linear-gradient(180deg, #140707 0%, #0a0a0a 60%);
   color:var(--text);
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .topbar{
@@ -64,6 +65,8 @@ body{
   transition:.25s;
   padding-top:60px;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.open{ left:0; }
@@ -77,9 +80,16 @@ body{
   transition:.2s;
   z-index: 999;
 }
-.overlay.show{
-  opacity:1;
-  pointer-events:auto;
+.overlay.show{ opacity:1; pointer-events:auto; }
+
+.main{ padding:16px; }
+
+.box{
+  background:var(--panel);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:16px;
+  border:1px solid rgba(220,38,38,0.3);
 }
 
 .item{
@@ -89,30 +99,8 @@ body{
   gap:10px;
   cursor:pointer;
   color:var(--muted);
-  border-left:3px solid transparent;
 }
-.item:hover{
-  background:rgba(220,38,38,0.08);
-  border-left:3px solid #dc2626;
-  color:white;
-}
-.item.active{
-  border-left:3px solid #dc2626;
-  color:white;
-}
-
-.main{
-  padding:16px;
-}
-
-.box{
-  background:var(--panel);
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:16px;
-  border:1px solid rgba(220,38,38,0.3);
-  box-shadow:0 0 0 1px rgba(220,38,38,0.15), 0 8px 32px rgba(0,0,0,0.4);
-}
+.item.active{ background:rgba(220,38,38,0.08); border-left:3px solid #dc2626; color:white; }
 
 input{
   width:100%;
@@ -122,6 +110,7 @@ input{
   border:1px solid rgba(220,38,38,0.2);
   background:#0f0606;
   color:white;
+  box-sizing: border-box;
 }
 
 button{
@@ -136,90 +125,146 @@ button{
   cursor:pointer;
 }
 
-.btn2{
-  background:#1f2937;
-}
+.btn2{ background:#1f2937; }
 
-.field{
-  display:flex;
-  gap:8px;
-  margin-top:8px;
-}
-
-.small{
-  width:40px;
-  border-radius:10px;
-  background:#1f2937;
-}
+.field{ display:flex; gap:8px; margin-top:8px; }
+.small{ width:40px; border-radius:10px; background:#1f2937; color:white; border:none; }
 
 .card{
   margin-top:10px;
-  padding:10px;
+  padding:12px;
   border-left:4px solid #dc2626;
   border-radius:12px;
   background:#0f0606;
 }
 
-#resultadoBotao {
-  margin-top: 15px;
-  text-align: center;
+.rank-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
 }
+.score { color: var(--gold); font-weight: bold; }
+.eval-btn { width:auto; margin:0; padding:4px 10px; font-size:10px; background:#1f2937; }
+
+.star-rating {
+  display: none;
+  flex-direction: row-reverse;
+  justify-content: center;
+  padding: 10px;
+  background: #140707;
+  border-radius: 12px;
+  margin: 10px 0;
+}
+.star-rating input { display: none; }
+.star-rating label { font-size: 28px; color: #222; cursor: pointer; transition: .2s;}
+.star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: var(--gold); }
+
+/* --- AJUSTES CONTA E CRIADORES --- */
+.sidebar-footer { 
+  margin-top: auto; 
+  padding: 20px 16px 50px 16px; 
+  border-top: 1px solid rgba(255,255,255,0.05); 
+}
+.btn-google { 
+  background: #fff; 
+  color: #000; 
+  font-size: 13px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 10px; 
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+}
+.profile-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.profile-area img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+.profile-info b { display: block; font-size: 14px; color: white; }
+.profile-info span { font-size: 11px; color: var(--muted); }
+
+.creator-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.creator-photo-card { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); cursor: pointer; object-fit: cover; }
+.creator-tag-text { font-size: 10px; color: var(--accent); font-weight: bold; flex-grow: 1; }
+
+.creator-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: #0f0606; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+.creator-card img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+
+/* Modal Fake para Nick */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1f2937; color: white; padding: 10px 20px; border-radius: 8px; z-index: 3000; display: none; font-size: 13px; border-bottom: 2px solid var(--accent); }
 </style>
 </head>
 
 <body>
 
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div id="modal-nick" class="modal">
+  <div class="box" style="width: 100%; max-width: 300px;">
+    <h3 style="margin:0">Quase lá!</h3>
+    <p style="font-size: 12px; color: var(--muted)">Escolha seu apelido de criador:</p>
+    <input id="input-nick" placeholder="Ex: Arthur_PRO">
+    <button onclick="finalizarCadastro()">Salvar e Entrar</button>
+  </div>
+</div>
 
+<div id="toast" class="toast"></div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-  <div class="item active" onclick="show('home');setActive(this);toggleMenu()">🏠 Home</div>
-  <div class="item" onclick="show('create');setActive(this);toggleMenu()">➕ Criar</div>
-  <div class="item" onclick="show('perfect-btn');setActive(this);toggleMenu()">🎯 Botão Perfeito</div>
+  <div class="item active" id="menu-home" onclick="show('home');setActive(this);toggleMenu()">🏠 Home</div>
+  <div class="item" id="menu-creators" onclick="show('creators');setActive(this);toggleMenu()">👥 Criadores</div>
+  <div class="item" onclick="show('create');setActive(this);toggleMenu()">➕ Criar Sensi</div>
+  
+  <div class="sidebar-footer" id="sidebar-auth">
+    <button onclick="loginGoogle()" class="btn-google">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+      Login com Google
+    </button>
+  </div>
 </div>
 
 <div class="topbar">
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
   <div style="display:flex;align-items:center;gap:8px;">
-    <img src="https://raw.githubusercontent.com/arthursantoslouro-ux/SATURNOX/refs/heads/main/logoapp.png"
-         style="width:30px;height:30px;border-radius:8px;box-shadow:0 0 10px rgba(220,38,38,0.6);">
+    <img src="https://raw.githubusercontent.com/arthursantoslouro-ux/SATURNOX/refs/heads/main/logoapp.png" style="width:30px;height:30px;border-radius:8px;">
     <div class="title">SENSIDRØID</div>
   </div>
 </div>
 
 <div class="main">
-
   <div id="home" class="box">
-    <h3>Sensibilidades e config</h3>
-    <div style="display:flex;gap:8px;">
-      <input id="search" placeholder="Buscar por nome..." oninput="filtrar()">
-      <input id="filtroData" type="date" onchange="filtrar()" style="max-width:150px;">
+    <h3>Configurações</h3>
+    <div style="display:flex; gap:8px;">
+      <input id="search" placeholder="Buscar sensi..." oninput="filtrar()">
+      <input id="filtroData" type="date" onchange="filtrar()" style="max-width:140px;">
     </div>
     <div id="lista"></div>
   </div>
 
+  <div id="creators" class="box" style="display:none">
+    <h3>Criadores</h3>
+    <input id="searchCreators" placeholder="Pesquisar criador pelo apelido..." oninput="filtrarCriadores()">
+    <div id="listaCriadores" style="margin-top:15px;"></div>
+  </div>
+
   <div id="create" class="box" style="display:none">
-    <h3>Criar Sensi</h3>
-    <input id="nome" placeholder="Nome da sensi">
+    <h3>Nova Sensi</h3>
+    <input id="nome" placeholder="Nome da Sensibilidade">
     <div id="fields"></div>
     <button class="btn2" onclick="addField()">+ Adicionar campo</button>
-    <button onclick="salvar()">Salvar Sensi</button>
+    <button onclick="salvar()">Postar Sensi</button>
   </div>
-
-  <div id="perfect-btn" class="box" style="display:none">
-    <h3>Gerador de Botão</h3>
-    <p style="color:var(--muted); font-size:14px;">Calcula o tamanho do botão baseado na resolução real detectada pelo sistema.</p>
-    <button onclick="gerarBotaoPerfeito()">GERAR BOTÃO PERFEITO</button>
-    <div id="resultadoBotao"></div>
-  </div>
-
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, getDoc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API",
+  apiKey: "AIzaSyBg_bOT4-bWgjEmFxvtELyYjhH4-t68d4U",
   authDomain: "sensidroidff.firebaseapp.com",
   projectId: "sensidroidff",
   storageBucket: "sensidroidff.firebasestorage.app",
@@ -229,160 +274,214 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
 
 let listaDados = [];
+let listaUsers = [];
+let userLogado = null;
+let perfilDados = null;
 
-// MENU
+const showToast = (msg) => {
+  const t = document.getElementById("toast");
+  t.innerText = msg; t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 3000);
+};
+
 window.toggleMenu = () => {
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
 };
 
 window.show = (p) => {
-  document.getElementById("home").style.display = p==="home"?"block":"none";
-  document.getElementById("create").style.display = p==="create"?"block":"none";
-  document.getElementById("perfect-btn").style.display = p==="perfect-btn"?"block":"none";
+  document.getElementById("home").style.display = p === "home" ? "block" : "none";
+  document.getElementById("creators").style.display = p === "creators" ? "block" : "none";
+  document.getElementById("create").style.display = p === "create" ? "block" : "none";
 };
 
-window.setActive = (el)=>{
-  document.querySelectorAll(".item").forEach(i=>i.classList.remove("active"));
+window.setActive = (el) => {
+  document.querySelectorAll(".item").forEach(i => i.classList.remove("active"));
   el.classList.add("active");
 };
 
-// LÓGICA DO BOTÃO PERFEITO USANDO DADOS DO SKETCHWARE
-window.gerarBotaoPerfeito = () => {
-  // Pega as variáveis window.screenWidth e window.screenHeight enviadas pelo Java
-  let w = window.screenWidth || window.innerWidth;
-  let h = window.screenHeight || window.innerHeight;
-  
-  // Algoritmo de cálculo para o botão (Baseado em DPI/Resolução)
-  let calculo = (w * 0.045) + (h * 0.012); 
-  let tamanhoFinal = Math.round(calculo);
-  
-  // Ajustes de limite para estabilidade no jogo
-  if(tamanhoFinal > 60) tamanhoFinal = 58;
-  if(tamanhoFinal < 39) tamanhoFinal = 44;
-
-  document.getElementById("resultadoBotao").innerHTML = `
-    <div class="card" style="border-left-color:#22c55e; background: rgba(34, 197, 94, 0.05);">
-      <small style="color:var(--muted)">Resolução: ${w}x${h}</small><br>
-      <span style="color:white; font-size:14px; font-weight:bold;">TAMANHO DO BOTÃO</span>
-      <div style="font-size:42px; color:#22c55e; font-family:'Rajdhani'; font-weight:700;">${tamanhoFinal}%</div>
-      <p style="font-size:11px; color:var(--muted); margin-top:5px;">Ideal para a sua sensibilidade atual.</p>
-    </div>
-  `;
+// --- LOGIN ---
+window.loginGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    userLogado = result.user;
+  } catch (e) {
+    showToast("Erro ao abrir login.");
+  }
 };
 
-// CAMPOS
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    userLogado = user;
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists()) {
+      perfilDados = snap.data();
+      montarPerfilSidebar();
+    } else {
+      document.getElementById("modal-nick").style.display = "flex";
+    }
+  }
+});
+
+window.finalizarCadastro = async () => {
+  const nick = document.getElementById("input-nick").value;
+  if (!nick) return showToast("Digite um apelido!");
+  perfilDados = { nick, uid: userLogado.uid, nomeReal: userLogado.displayName, foto: userLogado.photoURL, seguidores: [] };
+  await setDoc(doc(db, "users", userLogado.uid), perfilDados);
+  document.getElementById("modal-nick").style.display = "none";
+  montarPerfilSidebar();
+};
+
+function montarPerfilSidebar() {
+  const area = document.getElementById("sidebar-auth");
+  area.innerHTML = `
+    <div class="profile-area" onclick="showToast('Conta: ${perfilDados.nomeReal}')">
+      <img src="${perfilDados.foto}">
+      <div class="profile-info">
+        <b>@${perfilDados.nick}</b>
+        <span>${perfilDados.seguidores ? perfilDados.seguidores.length : 0} seguidores</span>
+      </div>
+    </div>
+  `;
+}
+
+window.verCriador = (nick) => {
+    show('creators');
+    setActive(document.getElementById('menu-creators'));
+    document.getElementById('searchCreators').value = nick;
+    filtrarCriadores();
+};
+
+window.seguir = async (idCriador) => {
+  if (!userLogado) return showToast("Faça login!");
+  if (userLogado.uid === idCriador) return showToast("Você não pode se seguir");
+  await updateDoc(doc(db, "users", idCriador), { seguidores: arrayUnion(userLogado.uid) });
+  showToast("Seguindo!");
+};
+
+function renderCriadores(users) {
+    const lista = document.getElementById("listaCriadores");
+    lista.innerHTML = "";
+    users.forEach(u => {
+        lista.innerHTML += `
+            <div class="creator-card">
+                <img src="${u.foto}">
+                <div style="flex-grow:1">
+                    <b style="color:white;">@${u.nick}</b><br>
+                    <small style="color:var(--muted)">${u.seguidores ? u.seguidores.length : 0} seguidores</small>
+                </div>
+                <button class="follow-btn" onclick="seguir('${u.uid}')" style="width:auto">SEGUIR</button>
+            </div>
+        `;
+    });
+}
+
+window.filtrarCriadores = () => {
+    const q = document.getElementById('searchCreators').value.toLowerCase();
+    renderCriadores(listaUsers.filter(u => u.nick.toLowerCase().includes(q)));
+};
+
+window.toggleRating = (id) => {
+  const el = document.getElementById('rate-'+id);
+  el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+};
+
+window.enviarAvaliacao = async (id, nota) => {
+  const ref = doc(db, "sensis", id);
+  const snap = await getDoc(ref);
+  const d = snap.data();
+  const novaSoma = (d.soma || 0) + nota;
+  const novoTotal = (d.total || 0) + 1;
+  await updateDoc(ref, { soma: novaSoma, total: novoTotal, media: novaSoma / novoTotal });
+  showToast("Avaliado!");
+};
+
 window.addField = () => {
   const div = document.createElement("div");
   div.className = "field";
-  div.innerHTML = `
-    <input placeholder="Nome">
-    <input placeholder="Valor">
-    <button class="small" onclick="this.parentElement.remove()">✕</button>
-  `;
+  div.innerHTML = `<input placeholder="Campo" class="k"><input placeholder="Valor" class="v"><button class="small" onclick="this.parentElement.remove()">✕</button>`;
   document.getElementById("fields").appendChild(div);
 };
 
-// DATA
-function formatarData(dataStr){
-  let data = dataStr ? new Date(dataStr) : new Date();
-  if(isNaN(data.getTime())) data = new Date();
-  let hoje = new Date();
-  let ontem = new Date();
-  ontem.setDate(hoje.getDate()-1);
-  let mesma = (a,b)=>
-    a.getFullYear()===b.getFullYear() &&
-    a.getMonth()===b.getMonth() &&
-    a.getDate()===b.getDate();
-  if(mesma(data,hoje)) return "Hoje";
-  if(mesma(data,ontem)) return "Ontem";
-  return data.toLocaleDateString();
-}
-
-// SALVAR
 window.salvar = async () => {
   const nome = document.getElementById("nome").value;
-  let obj = { 
-    nome: nome || "sem nome",
-    data: new Date().toISOString()
-  };
-  document.querySelectorAll(".field").forEach(f=>{
-    let k = f.children[0].value;
-    let v = f.children[1].value;
-    if(k) obj[k] = v || "0";
+  if(!nome || !perfilDados) return showToast("Dê um nome ou faça login!");
+  let configOrder = [];
+  document.querySelectorAll(".field").forEach(f => {
+    let k = f.querySelector(".k").value;
+    let v = f.querySelector(".v").value;
+    if(k) configOrder.push({ label: k, valor: v });
   });
-  await addDoc(collection(db,"sensis"), obj);
-  document.getElementById("fields").innerHTML="";
-  document.getElementById("nome").value="";
+  await addDoc(collection(db, "sensis"), { 
+    nome, data: new Date().toISOString(), media: 0, soma: 0, total: 0, config: configOrder,
+    criadorNick: perfilDados.nick, criadorId: perfilDados.uid, criadorFoto: perfilDados.foto
+  });
+  document.getElementById("fields").innerHTML = "";
+  document.getElementById("nome").value = "";
+  showToast("Publicado!");
+  show('home');
 };
 
-// COPIAR
-window.copiarSensi = async (d) => {
-  let texto = `${d.nome}\n\n`;
-  Object.keys(d).forEach(k=>{
-    if(k !== "nome" && k !== "data"){
-      texto += `${k}: ${d[k]}\n`;
-    }
-  });
-  await navigator.clipboard.writeText(texto);
-  alert("Copiado!");
-};
+function formatData(str) {
+  const d = new Date(str);
+  const diff = Math.floor((new Date() - d) / 86400000);
+  return diff === 0 ? "Hoje" : diff === 1 ? "Ontem" : `${diff} dias atrás`;
+}
 
-// RENDER
-function render(listaFiltrada){
+function render(f) {
   const lista = document.getElementById("lista");
-  listaFiltrada.sort((a,b)=>{
-    let da = new Date(a.data || 0).getTime();
-    let db = new Date(b.data || 0).getTime();
-    return db - da;
-  });
-  lista.innerHTML="";
-  listaFiltrada.forEach(d=>{
+  lista.innerHTML = "";
+  f.forEach(d => {
     let html = `<div class="card">
-      <div style="display:flex;justify-content:space-between;">
-        <b>${d.nome}</b>
-        <small>${formatarData(d.data)}</small>
+      <div class="creator-header">
+        <img src="${d.criadorFoto || 'https://www.w3schools.com/howto/img_avatar.png'}" class="creator-photo-card" onclick="verCriador('${d.criadorNick}')">
+        <span class="creator-tag-text">@${d.criadorNick || 'Anônimo'}</span>
+        <button class="follow-btn" onclick="seguir('${d.criadorId}')">SEGUIR</button>
       </div>
-      <button onclick='copiarSensi(${JSON.stringify(d)})' style="width:auto;padding:6px 10px;font-size:12px;margin-top:5px;">
-        Copiar
-      </button><br>`;
-    Object.keys(d).forEach(k=>{
-      if(k !== "nome" && k !== "data"){
-        html += `${k}: ${d[k]}<br>`;
-      }
-    });
-    html += `</div>`;
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <b>${d.nome}</b>
+        <small style="color:var(--muted)">${formatData(d.data)}</small>
+      </div>
+      <div class="rank-line">
+        <span class="score">★ ${d.media ? d.media.toFixed(1) : "0.0"}</span>
+        <button class="eval-btn" onclick="toggleRating('${d.id}')">Avaliar</button>
+      </div>
+      <div class="star-rating" id="rate-${d.id}">
+        ${[6,5,4,3,2,1].map(n => `<input type="radio" id="s${n}${d.id}" name="r${d.id}" onclick="enviarAvaliacao('${d.id}',${n})"><label for="s${n}${d.id}">★</label>`).join('')}
+      </div>
+      <div style="margin-top:8px; line-height:1.4; color:#ddd;">`;
+    if(d.config) d.config.forEach(i => { html += `<div style="font-size:14px;">${i.label}: ${i.valor}</div>`; });
+    html += `</div><button onclick='copiar(${JSON.stringify(d)})' style="width:auto;padding:6px 12px;font-size:11px;margin-top:10px">Copiar Config</button></div>`;
     lista.innerHTML += html;
   });
 }
 
-// FILTRO
-window.filtrar = () => {
-  let q = document.getElementById("search").value.toLowerCase();
-  let dataFiltro = document.getElementById("filtroData").value;
-  let filtrado = listaDados.filter(d => {
-    let nomeOk = (d.nome || "").toLowerCase().includes(q);
-    if(!dataFiltro) return nomeOk;
-    if(!d.data) return false;
-    let dataObj = new Date(d.data);
-    let dataItem = `${dataObj.getFullYear()}-${String(dataObj.getMonth()+1).padStart(2,'0')}-${String(dataObj.getDate()).padStart(2,'0')}`;
-    return nomeOk && dataItem === dataFiltro;
-  });
-  render(filtrado);
+window.copiar = (d) => {
+  let t = `${d.nome}\n\n`;
+  if(d.config) d.config.forEach(i => t += `${i.label}: ${i.valor}\n`);
+  navigator.clipboard.writeText(t);
+  showToast("Copiado!");
 };
 
-onSnapshot(collection(db,"sensis"), snap=>{
-  listaDados = [];
-  snap.forEach(doc=>{
-    listaDados.push(doc.data());
-  });
+window.filtrar = () => {
+  const q = document.getElementById("search").value.toLowerCase();
+  render(listaDados.filter(d => (d.nome || "").toLowerCase().includes(q)));
+};
+
+onSnapshot(query(collection(db, "sensis"), orderBy("data", "desc")), snap => {
+  listaDados = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
   render(listaDados);
 });
-</script>
 
+onSnapshot(collection(db, "users"), snap => {
+    listaUsers = snap.docs.map(doc => doc.data());
+    renderCriadores(listaUsers);
+});
+</script>
 </body>
 </html>
